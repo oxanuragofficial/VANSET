@@ -1,4 +1,4 @@
-package vanset_backend;
+package vanset_backend.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,9 +12,16 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/health").permitAll()
-                        .anyRequest().authenticated()
+                        .requestMatchers(
+                                "/api/health",
+                                "/api/test",
+                                "/api/products",
+                                "/api/products/**",
+                                 "/error"
+                        ).permitAll()
+                       .anyRequest().authenticated()
                 );
 
         return http.build();
