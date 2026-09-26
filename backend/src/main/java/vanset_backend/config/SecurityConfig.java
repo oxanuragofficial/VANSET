@@ -19,9 +19,11 @@ public class SecurityConfig {
                                 "/api/test",
                                 "/api/products",
                                 "/api/products/**",
-                                 "/error"
+                                "/api/categories",
+                                "/api/categories/**",
+                                "/error"
                         ).permitAll()
-                       .anyRequest().authenticated()
+                        .anyRequest().authenticated()
                 );
 
         return http.build();

@@ -6,71 +6,94 @@ import org.springframework.stereotype.Service;
 
 import vanset_backend.dto.ProductRequest;
 import vanset_backend.dto.ProductResponse;
+import vanset_backend.entity.Category;
 import vanset_backend.entity.Product;
+import vanset_backend.exception.CategoryNotFoundException;
 import vanset_backend.exception.ProductNotFoundException;
+import vanset_backend.repository.CategoryRepository;
 import vanset_backend.repository.ProductRepository;
 
 @Service
 public class ProductService {
 
     private final ProductRepository productRepository;
+    private final CategoryRepository categoryRepository;
 
-    public ProductService(ProductRepository productRepository) {
+    public ProductService(
+            ProductRepository productRepository,
+            CategoryRepository categoryRepository) {
+
         this.productRepository = productRepository;
+        this.categoryRepository = categoryRepository;
     }
 
-public ProductResponse createProduct(ProductRequest request) {
+    public ProductResponse createProduct(ProductRequest request) {
 
-    Product product = new Product();
+        Product product = new Product();
 
-    product.setName(request.getName());
-    product.setDescription(request.getDescription());
-    product.setActive(request.isActive());
+        Category category = categoryRepository.findById(request.getCategoryId())
+                .orElseThrow(() ->
+                        new CategoryNotFoundException(request.getCategoryId()));
 
-    Product savedProduct = productRepository.save(product);
+        product.setName(request.getName());
+        product.setDescription(request.getDescription());
+        product.setActive(request.isActive());
+        product.setCategory(category);
 
-    return new ProductResponse(
-            savedProduct.getId(),
-            savedProduct.getName(),
-            savedProduct.getDescription(),
-            savedProduct.isActive()
-    );
-}
+        Product savedProduct = productRepository.save(product);
 
-public List<ProductResponse> getAllProducts() {
+        return new ProductResponse(
+                savedProduct.getId(),
+                savedProduct.getName(),
+                savedProduct.getDescription(),
+                savedProduct.isActive(),
+                savedProduct.getCategory().getId()
+        );
+    }
 
-    return productRepository.findAll()
-            .stream()
-            .map(product -> new ProductResponse(
-                    product.getId(),
-                    product.getName(),
-                    product.getDescription(),
-                    product.isActive()
-            ))
-            .toList();
-}
+    public List<ProductResponse> getAllProducts() {
 
-public ProductResponse getProductById(Long id) {
+        return productRepository.findAll()
+                .stream()
+                .map(product -> new ProductResponse(
+                        product.getId(),
+                        product.getName(),
+                        product.getDescription(),
+                        product.isActive(),
+                        product.getCategory().getId()
+                ))
+                .toList();
+    }
 
-    Product product = productRepository.findById(id)
-            .orElseThrow(() -> new ProductNotFoundException(id));
+    public ProductResponse getProductById(Long id) {
 
-    return new ProductResponse(
-            product.getId(),
-            product.getName(),
-            product.getDescription(),
-            product.isActive()
-    );
-}
+        Product product = productRepository.findById(id)
+                .orElseThrow(() -> new ProductNotFoundException(id));
 
-public ProductResponse updateProduct(Long id, ProductRequest request) {
+        return new ProductResponse(
+                product.getId(),
+                product.getName(),
+                product.getDescription(),
+                product.isActive(),
+                product.getCategory().getId()
+        );
+    }
+
+   public ProductResponse updateProduct(
+        Long id,
+        ProductRequest request) {
 
     Product existingProduct = productRepository.findById(id)
             .orElseThrow(() -> new ProductNotFoundException(id));
 
+    Category category = categoryRepository.findById(request.getCategoryId())
+            .orElseThrow(() ->
+                    new CategoryNotFoundException(request.getCategoryId()));
+
     existingProduct.setName(request.getName());
     existingProduct.setDescription(request.getDescription());
     existingProduct.setActive(request.isActive());
+    existingProduct.setCategory(category);
 
     Product savedProduct = productRepository.save(existingProduct);
 
@@ -78,10 +101,12 @@ public ProductResponse updateProduct(Long id, ProductRequest request) {
             savedProduct.getId(),
             savedProduct.getName(),
             savedProduct.getDescription(),
-            savedProduct.isActive()
+            savedProduct.isActive(),
+            savedProduct.getCategory().getId()
     );
 }
-public void deleteProduct(Long id) {
-    productRepository.deleteById(id);
-}
+
+    public void deleteProduct(Long id) {
+        productRepository.deleteById(id);
+    }
 }

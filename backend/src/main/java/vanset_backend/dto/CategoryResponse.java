@@ -1,6 +1,6 @@
 package vanset_backend.dto;
 
-public class ProductResponse {
+public class CategoryResponse {
 
     private Long id;
 
@@ -10,20 +10,16 @@ public class ProductResponse {
 
     private boolean active;
 
-    private Long categoryId;
-
-    public ProductResponse(
+    public CategoryResponse(
             Long id,
             String name,
             String description,
-            boolean active,
-            Long categoryId) {
+            boolean active) {
 
         this.id = id;
         this.name = name;
         this.description = description;
         this.active = active;
-        this.categoryId = categoryId;
     }
 
     public Long getId() {
@@ -40,9 +36,5 @@ public class ProductResponse {
 
     public boolean isActive() {
         return active;
-    }
-
-    public Long getCategoryId() {
-        return categoryId;
     }
 }

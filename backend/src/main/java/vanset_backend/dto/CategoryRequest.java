@@ -2,16 +2,14 @@ package vanset_backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
 
-public class ProductRequest {
+public class CategoryRequest {
 
-    @NotBlank(message = "Product name is required")
+    @NotBlank(message = "Category name is required")
     private String name;
 
     private String description;
 
     private boolean active;
-
-    private Long categoryId;
 
     public String getName() {
         return name;
@@ -35,13 +33,5 @@ public class ProductRequest {
 
     public void setActive(boolean active) {
         this.active = active;
-    }
-
-    public Long getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
     }
 }

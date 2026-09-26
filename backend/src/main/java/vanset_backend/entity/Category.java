@@ -1,17 +1,26 @@
-package vanset_backend.dto;
+package vanset_backend.entity;
 
-import jakarta.validation.constraints.NotBlank;
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 
-public class ProductRequest {
+@Entity
+public class Category {
 
-    @NotBlank(message = "Product name is required")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
     private String name;
 
     private String description;
 
-    private boolean active;
+    private boolean active = true;
 
-    private Long categoryId;
+    public Long getId() {
+        return id;
+    }
 
     public String getName() {
         return name;
@@ -35,13 +44,5 @@ public class ProductRequest {
 
     public void setActive(boolean active) {
         this.active = active;
-    }
-
-    public Long getCategoryId() {
-        return categoryId;
-    }
-
-    public void setCategoryId(Long categoryId) {
-        this.categoryId = categoryId;
     }
 }
