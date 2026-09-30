@@ -23,6 +23,8 @@ public class SecurityConfig {
                         "/api/categories/**",
                         "/api/product-variants",
                         "/api/product-variants/**",
+                        "/api/collections",
+                        "/api/collections/**",
                         "/error"
                 ).permitAll()
                 .anyRequest().authenticated()
