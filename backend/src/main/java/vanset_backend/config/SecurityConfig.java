@@ -25,7 +25,9 @@ public class SecurityConfig {
                         "/api/product-variants/**",
                         "/api/collections",
                         "/api/collections/**",
-                        "/error"
+                        "/error",
+                        "/api/orders",
+                        "/api/orders/**"
                 ).permitAll()
                 .anyRequest().authenticated()
                 );
