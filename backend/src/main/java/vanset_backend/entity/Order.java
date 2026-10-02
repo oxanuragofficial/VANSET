@@ -24,6 +24,18 @@ public class Order {
 
     private LocalDateTime createdAt;
 
+    private String deliveryRecipientName;
+
+    private String deliveryPhone;
+
+    private String deliveryAddressLine;
+
+    private String deliveryCity;
+
+    private String deliveryState;
+
+    private String deliveryPincode;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
@@ -54,6 +66,54 @@ public class Order {
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public String getDeliveryRecipientName() {
+        return deliveryRecipientName;
+    }
+
+    public void setDeliveryRecipientName(String deliveryRecipientName) {
+        this.deliveryRecipientName = deliveryRecipientName;
+    }
+
+    public String getDeliveryPhone() {
+        return deliveryPhone;
+    }
+
+    public void setDeliveryPhone(String deliveryPhone) {
+        this.deliveryPhone = deliveryPhone;
+    }
+
+    public String getDeliveryAddressLine() {
+        return deliveryAddressLine;
+    }
+
+    public void setDeliveryAddressLine(String deliveryAddressLine) {
+        this.deliveryAddressLine = deliveryAddressLine;
+    }
+
+    public String getDeliveryCity() {
+        return deliveryCity;
+    }
+
+    public void setDeliveryCity(String deliveryCity) {
+        this.deliveryCity = deliveryCity;
+    }
+
+    public String getDeliveryState() {
+        return deliveryState;
+    }
+
+    public void setDeliveryState(String deliveryState) {
+        this.deliveryState = deliveryState;
+    }
+
+    public String getDeliveryPincode() {
+        return deliveryPincode;
+    }
+
+    public void setDeliveryPincode(String deliveryPincode) {
+        this.deliveryPincode = deliveryPincode;
     }
 
     public User getUser() {

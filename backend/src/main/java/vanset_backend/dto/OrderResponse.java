@@ -10,6 +10,14 @@ public class OrderResponse {
     private String status;
     private double totalAmount;
     private LocalDateTime createdAt;
+
+    private String deliveryRecipientName;
+    private String deliveryPhone;
+    private String deliveryAddressLine;
+    private String deliveryCity;
+    private String deliveryState;
+    private String deliveryPincode;
+
     private List<OrderItemResponse> items;
 
     public OrderResponse(
@@ -18,6 +26,12 @@ public class OrderResponse {
             String status,
             double totalAmount,
             LocalDateTime createdAt,
+            String deliveryRecipientName,
+            String deliveryPhone,
+            String deliveryAddressLine,
+            String deliveryCity,
+            String deliveryState,
+            String deliveryPincode,
             List<OrderItemResponse> items) {
 
         this.id = id;
@@ -25,6 +39,14 @@ public class OrderResponse {
         this.status = status;
         this.totalAmount = totalAmount;
         this.createdAt = createdAt;
+
+        this.deliveryRecipientName = deliveryRecipientName;
+        this.deliveryPhone = deliveryPhone;
+        this.deliveryAddressLine = deliveryAddressLine;
+        this.deliveryCity = deliveryCity;
+        this.deliveryState = deliveryState;
+        this.deliveryPincode = deliveryPincode;
+
         this.items = items;
     }
 
@@ -46,6 +68,30 @@ public class OrderResponse {
 
     public LocalDateTime getCreatedAt() {
         return createdAt;
+    }
+
+    public String getDeliveryRecipientName() {
+        return deliveryRecipientName;
+    }
+
+    public String getDeliveryPhone() {
+        return deliveryPhone;
+    }
+
+    public String getDeliveryAddressLine() {
+        return deliveryAddressLine;
+    }
+
+    public String getDeliveryCity() {
+        return deliveryCity;
+    }
+
+    public String getDeliveryState() {
+        return deliveryState;
+    }
+
+    public String getDeliveryPincode() {
+        return deliveryPincode;
     }
 
     public List<OrderItemResponse> getItems() {
