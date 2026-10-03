@@ -1,13 +1,16 @@
+
 package vanset_backend.dto;
 
 import java.time.LocalDateTime;
 import java.util.List;
 
+import vanset_backend.entity.OrderStatus;
+
 public class OrderResponse {
 
     private Long id;
     private Long userId;
-    private String status;
+    private OrderStatus status;
     private double totalAmount;
     private LocalDateTime createdAt;
 
@@ -23,7 +26,7 @@ public class OrderResponse {
     public OrderResponse(
             Long id,
             Long userId,
-            String status,
+            OrderStatus status,
             double totalAmount,
             LocalDateTime createdAt,
             String deliveryRecipientName,
@@ -58,7 +61,7 @@ public class OrderResponse {
         return userId;
     }
 
-    public String getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 

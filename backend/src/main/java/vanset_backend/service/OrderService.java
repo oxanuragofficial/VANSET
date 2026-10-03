@@ -25,7 +25,7 @@ import vanset_backend.repository.OrderItemRepository;
 import vanset_backend.repository.OrderRepository;
 import vanset_backend.repository.ProductVariantRepository;
 import vanset_backend.repository.UserRepository;
-
+import vanset_backend.entity.OrderStatus;
 @Service
 public class OrderService {
 
@@ -68,7 +68,7 @@ public class OrderService {
         Order order = new Order();
 
         order.setUser(user);
-        order.setStatus("PENDING");
+       order.setStatus(OrderStatus.PENDING);
         order.setCreatedAt(LocalDateTime.now());
         order.setTotalAmount(0);
 
