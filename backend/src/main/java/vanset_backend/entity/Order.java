@@ -3,6 +3,8 @@ package vanset_backend.entity;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -18,7 +20,8 @@ public class Order {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String status;
+    @Enumerated(EnumType.STRING)
+    private OrderStatus status;
 
     private double totalAmount;
 
@@ -44,11 +47,11 @@ public class Order {
         return id;
     }
 
-    public String getStatus() {
+    public OrderStatus getStatus() {
         return status;
     }
 
-    public void setStatus(String status) {
+    public void setStatus(OrderStatus status) {
         this.status = status;
     }
 
