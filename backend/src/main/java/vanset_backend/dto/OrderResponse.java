@@ -1,5 +1,6 @@
 package vanset_backend.dto;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -10,7 +11,7 @@ public class OrderResponse {
     private Long id;
     private Long userId;
     private OrderStatus status;
-    private double totalAmount;
+    private BigDecimal totalAmount;
     private LocalDateTime createdAt;
 
     private String deliveryRecipientName;
@@ -26,7 +27,7 @@ public class OrderResponse {
             Long id,
             Long userId,
             OrderStatus status,
-            double totalAmount,
+            BigDecimal totalAmount,
             LocalDateTime createdAt,
             String deliveryRecipientName,
             String deliveryPhone,
@@ -64,7 +65,7 @@ public class OrderResponse {
         return status;
     }
 
-    public double getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 

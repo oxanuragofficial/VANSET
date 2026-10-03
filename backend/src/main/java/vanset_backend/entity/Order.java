@@ -1,29 +1,29 @@
 package vanset_backend.entity;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "orders")
 public class Order {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+
     private OrderStatus status;
 
-    private double totalAmount;
+    private BigDecimal totalAmount;
 
     private LocalDateTime createdAt;
 
@@ -39,12 +39,16 @@ public class Order {
 
     private String deliveryPincode;
 
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
-
     public Long getId() {
         return id;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     public OrderStatus getStatus() {
@@ -55,11 +59,11 @@ public class Order {
         this.status = status;
     }
 
-    public double getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(double totalAmount) {
+    public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
     }
 
@@ -117,13 +121,5 @@ public class Order {
 
     public void setDeliveryPincode(String deliveryPincode) {
         this.deliveryPincode = deliveryPincode;
-    }
-
-    public User getUser() {
-        return user;
-    }
-
-    public void setUser(User user) {
-        this.user = user;
     }
 }

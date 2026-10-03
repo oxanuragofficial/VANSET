@@ -72,7 +72,7 @@ public class OrderService {
         order.setUser(user);
         order.setStatus(OrderStatus.PENDING);
         order.setCreatedAt(LocalDateTime.now());
-        order.setTotalAmount(0);
+        order.setTotalAmount(BigDecimal.ZERO);
 
         order.setDeliveryRecipientName(
                 address.getRecipientName());
@@ -94,7 +94,7 @@ public class OrderService {
 
         Order savedOrder = orderRepository.save(order);
 
-        double totalAmount = 0;
+        BigDecimal totalAmount = BigDecimal.ZERO;
 
         for (OrderItemRequest itemRequest : request.getItems()) {
 
@@ -131,9 +131,11 @@ public class OrderService {
 
             productVariantRepository.save(productVariant);
 
-            totalAmount +=
-                    productVariant.getPrice().doubleValue()
-                            * requestedQuantity;
+            BigDecimal itemTotal = price.multiply(
+                    BigDecimal.valueOf(requestedQuantity)
+            );
+
+            totalAmount = totalAmount.add(itemTotal);
         }
 
         savedOrder.setTotalAmount(totalAmount);
