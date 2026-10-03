@@ -1,21 +1,19 @@
 package vanset_backend.dto;
 
+import java.math.BigDecimal;
+
 public class ProductVariantResponse {
 
     private Long id;
-
     private String name;
-
-    private double price;
-
+    private BigDecimal price;
     private int stockQuantity;
-
     private Long productId;
 
     public ProductVariantResponse(
             Long id,
             String name,
-            double price,
+            BigDecimal price,
             int stockQuantity,
             Long productId) {
 
@@ -34,7 +32,7 @@ public class ProductVariantResponse {
         return name;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 

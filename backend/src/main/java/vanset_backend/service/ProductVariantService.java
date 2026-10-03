@@ -57,9 +57,10 @@ public class ProductVariantService {
 
     public ProductVariantResponse getVariantById(Long id) {
 
-        ProductVariant variant = productVariantRepository.findById(id)
-                .orElseThrow(() ->
-                        new ProductVariantNotFoundException(id));
+        ProductVariant variant =
+                productVariantRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ProductVariantNotFoundException(id));
 
         return toResponse(variant);
     }
@@ -68,7 +69,7 @@ public class ProductVariantService {
             Long id,
             ProductVariantRequest request) {
 
-        ProductVariant existingVariant =
+        ProductVariant variant =
                 productVariantRepository.findById(id)
                         .orElseThrow(() ->
                                 new ProductVariantNotFoundException(id));
@@ -77,27 +78,29 @@ public class ProductVariantService {
                 .orElseThrow(() ->
                         new ProductNotFoundException(request.getProductId()));
 
-        existingVariant.setName(request.getName());
-        existingVariant.setPrice(request.getPrice());
-        existingVariant.setStockQuantity(request.getStockQuantity());
-        existingVariant.setProduct(product);
+        variant.setName(request.getName());
+        variant.setPrice(request.getPrice());
+        variant.setStockQuantity(request.getStockQuantity());
+        variant.setProduct(product);
 
-        ProductVariant savedVariant =
-                productVariantRepository.save(existingVariant);
+        ProductVariant updatedVariant =
+                productVariantRepository.save(variant);
 
-        return toResponse(savedVariant);
+        return toResponse(updatedVariant);
     }
 
     public void deleteVariant(Long id) {
 
-        if (!productVariantRepository.existsById(id)) {
-            throw new ProductVariantNotFoundException(id);
-        }
+        ProductVariant variant =
+                productVariantRepository.findById(id)
+                        .orElseThrow(() ->
+                                new ProductVariantNotFoundException(id));
 
-        productVariantRepository.deleteById(id);
+        productVariantRepository.delete(variant);
     }
 
-    private ProductVariantResponse toResponse(ProductVariant variant) {
+    private ProductVariantResponse toResponse(
+            ProductVariant variant) {
 
         return new ProductVariantResponse(
                 variant.getId(),

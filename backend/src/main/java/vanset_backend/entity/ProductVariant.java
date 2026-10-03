@@ -1,5 +1,7 @@
 package vanset_backend.entity;
 
+import java.math.BigDecimal;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,7 +18,7 @@ public class ProductVariant {
 
     private String name;
 
-    private double price;
+    private BigDecimal price;
 
     private int stockQuantity;
 
@@ -36,11 +38,11 @@ public class ProductVariant {
         this.name = name;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 

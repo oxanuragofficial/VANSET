@@ -113,8 +113,7 @@ public class OrderService {
                                 + productVariant.getId());
             }
 
-            BigDecimal price =
-                    BigDecimal.valueOf(productVariant.getPrice());
+            BigDecimal price = productVariant.getPrice();
 
             OrderItem orderItem = new OrderItem();
 
@@ -133,7 +132,8 @@ public class OrderService {
             productVariantRepository.save(productVariant);
 
             totalAmount +=
-                    productVariant.getPrice() * requestedQuantity;
+                    productVariant.getPrice().doubleValue()
+                            * requestedQuantity;
         }
 
         savedOrder.setTotalAmount(totalAmount);
