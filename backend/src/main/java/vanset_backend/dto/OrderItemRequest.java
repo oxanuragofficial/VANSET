@@ -1,3 +1,4 @@
+
 package vanset_backend.dto;
 
 import jakarta.validation.constraints.Min;
@@ -8,8 +9,9 @@ public class OrderItemRequest {
     @NotNull(message = "Product variant ID is required")
     private Long productVariantId;
 
+    @NotNull(message = "Quantity is required")
     @Min(value = 1, message = "Quantity must be at least 1")
-    private int quantity;
+    private Integer quantity;
 
     public Long getProductVariantId() {
         return productVariantId;
@@ -19,11 +21,11 @@ public class OrderItemRequest {
         this.productVariantId = productVariantId;
     }
 
-    public int getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(int quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 }
