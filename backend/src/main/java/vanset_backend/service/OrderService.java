@@ -154,6 +154,53 @@ public class OrderService {
         return toResponse(order);
     }
 
+    @Transactional
+    public OrderResponse updateOrderStatus(
+            Long id,
+            OrderStatus newStatus) {
+
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() ->
+                        new OrderNotFoundException(id));
+
+        OrderStatus currentStatus = order.getStatus();
+
+        if (!isValidTransition(currentStatus, newStatus)) {
+            throw new IllegalArgumentException(
+                    "Invalid order status transition: "
+                            + currentStatus
+                            + " -> "
+                            + newStatus);
+        }
+
+        order.setStatus(newStatus);
+
+        Order savedOrder = orderRepository.save(order);
+
+        return toResponse(savedOrder);
+    }
+
+    private boolean isValidTransition(
+            OrderStatus currentStatus,
+            OrderStatus newStatus) {
+
+        if (currentStatus == OrderStatus.PENDING) {
+            return newStatus == OrderStatus.CONFIRMED
+                    || newStatus == OrderStatus.CANCELLED;
+        }
+
+        if (currentStatus == OrderStatus.CONFIRMED) {
+            return newStatus == OrderStatus.SHIPPED
+                    || newStatus == OrderStatus.CANCELLED;
+        }
+
+        if (currentStatus == OrderStatus.SHIPPED) {
+            return newStatus == OrderStatus.DELIVERED;
+        }
+
+        return false;
+    }
+
     private OrderResponse toResponse(Order order) {
 
         List<OrderItemResponse> items =
