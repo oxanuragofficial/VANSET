@@ -4,13 +4,16 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-
+import jakarta.persistence.Table;
 @Entity
+@Table(name = "orders")
 public class Order {
 
     @Id
@@ -21,7 +24,8 @@ public class Order {
     @JoinColumn(name = "user_id")
     private User user;
 
-    private OrderStatus status;
+   @Enumerated(EnumType.STRING)
+private OrderStatus status;
 
     private BigDecimal totalAmount;
 
