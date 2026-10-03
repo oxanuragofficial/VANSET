@@ -1,5 +1,6 @@
 package vanset_backend.service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -13,6 +14,7 @@ import vanset_backend.dto.OrderResponse;
 import vanset_backend.entity.Address;
 import vanset_backend.entity.Order;
 import vanset_backend.entity.OrderItem;
+import vanset_backend.entity.OrderStatus;
 import vanset_backend.entity.ProductVariant;
 import vanset_backend.entity.User;
 import vanset_backend.exception.AddressNotFoundException;
@@ -25,7 +27,7 @@ import vanset_backend.repository.OrderItemRepository;
 import vanset_backend.repository.OrderRepository;
 import vanset_backend.repository.ProductVariantRepository;
 import vanset_backend.repository.UserRepository;
-import vanset_backend.entity.OrderStatus;
+
 @Service
 public class OrderService {
 
@@ -53,12 +55,12 @@ public class OrderService {
     public OrderResponse createOrder(OrderRequest request) {
 
         User user = userRepository.findById(request.getUserId())
-                .orElseThrow(()
-                        -> new UserNotFoundException(request.getUserId()));
+                .orElseThrow(() ->
+                        new UserNotFoundException(request.getUserId()));
 
         Address address = addressRepository.findById(request.getAddressId())
-                .orElseThrow(()
-                        -> new AddressNotFoundException(request.getAddressId()));
+                .orElseThrow(() ->
+                        new AddressNotFoundException(request.getAddressId()));
 
         if (!address.getUser().getId().equals(user.getId())) {
             throw new IllegalArgumentException(
@@ -68,7 +70,7 @@ public class OrderService {
         Order order = new Order();
 
         order.setUser(user);
-       order.setStatus(OrderStatus.PENDING);
+        order.setStatus(OrderStatus.PENDING);
         order.setCreatedAt(LocalDateTime.now());
         order.setTotalAmount(0);
 
@@ -96,22 +98,23 @@ public class OrderService {
 
         for (OrderItemRequest itemRequest : request.getItems()) {
 
-            ProductVariant productVariant
-                    = productVariantRepository
+            ProductVariant productVariant =
+                    productVariantRepository
                             .findById(itemRequest.getProductVariantId())
-                            .orElseThrow(()
-                                    -> new ProductVariantNotFoundException(
-                                    itemRequest.getProductVariantId()));
+                            .orElseThrow(() ->
+                                    new ProductVariantNotFoundException(
+                                            itemRequest.getProductVariantId()));
 
             int requestedQuantity = itemRequest.getQuantity();
 
             if (requestedQuantity > productVariant.getStockQuantity()) {
                 throw new InsufficientStockException(
                         "Insufficient stock for variant: "
-                        + productVariant.getId());
+                                + productVariant.getId());
             }
 
-            double price = productVariant.getPrice();
+            BigDecimal price =
+                    BigDecimal.valueOf(productVariant.getPrice());
 
             OrderItem orderItem = new OrderItem();
 
@@ -124,12 +127,13 @@ public class OrderService {
 
             productVariant.setStockQuantity(
                     productVariant.getStockQuantity()
-                    - requestedQuantity
+                            - requestedQuantity
             );
 
             productVariantRepository.save(productVariant);
 
-            totalAmount += price * requestedQuantity;
+            totalAmount +=
+                    productVariant.getPrice() * requestedQuantity;
         }
 
         savedOrder.setTotalAmount(totalAmount);
@@ -142,23 +146,23 @@ public class OrderService {
     public OrderResponse getOrderById(Long id) {
 
         Order order = orderRepository.findById(id)
-                .orElseThrow(()
-                        -> new OrderNotFoundException(id));
+                .orElseThrow(() ->
+                        new OrderNotFoundException(id));
 
         return toResponse(order);
     }
 
     private OrderResponse toResponse(Order order) {
 
-        List<OrderItemResponse> items
-                = orderItemRepository.findByOrderId(order.getId())
+        List<OrderItemResponse> items =
+                orderItemRepository.findByOrderId(order.getId())
                         .stream()
                         .map(item -> new OrderItemResponse(
-                        item.getId(),
-                        item.getProductVariant().getId(),
-                        item.getQuantity(),
-                        item.getPrice()
-                ))
+                                item.getId(),
+                                item.getProductVariant().getId(),
+                                item.getQuantity(),
+                                item.getPrice()
+                        ))
                         .toList();
 
         return new OrderResponse(

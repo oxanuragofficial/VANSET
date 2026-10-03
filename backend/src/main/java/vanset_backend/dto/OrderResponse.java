@@ -1,4 +1,3 @@
-
 package vanset_backend.dto;
 
 import java.time.LocalDateTime;
