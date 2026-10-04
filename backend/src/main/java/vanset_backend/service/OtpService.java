@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import vanset_backend.entity.OtpRequest;
+import vanset_backend.exception.InvalidIdentifierException;
+import vanset_backend.exception.OtpRateLimitException;
 import vanset_backend.repository.OtpRequestRepository;
 
 @Service
@@ -16,31 +18,58 @@ public class OtpService {
 
     private static final int OTP_EXPIRY_MINUTES = 5;
     private static final int MAX_ATTEMPTS = 5;
-
+    private static final int RESEND_COOLDOWN_SECONDS = 60;
     private final OtpRequestRepository otpRequestRepository;
 
-    private final SecureRandom secureRandom =
-            new SecureRandom();
+    private final SecureRandom secureRandom
+            = new SecureRandom();
 
     public OtpService(
             OtpRequestRepository otpRequestRepository) {
 
-        this.otpRequestRepository =
-                otpRequestRepository;
+        this.otpRequestRepository
+                = otpRequestRepository;
     }
 
     @Transactional
     public String generateOtp(String identifier) {
 
-        String normalizedIdentifier =
-                normalizeIdentifier(identifier);
+        String normalizedIdentifier
+                = normalizeIdentifier(identifier);
+
+        LocalDateTime now
+                = LocalDateTime.now();
+
+        OtpRequest latestRequest
+                = otpRequestRepository
+                        .findTopByIdentifierOrderByCreatedAtDesc(
+                                normalizedIdentifier
+                        )
+                        .orElse(null);
+
+        if (latestRequest != null) {
+
+            LocalDateTime cooldownEndsAt
+                    = latestRequest.getCreatedAt()
+                            .plusSeconds(
+                                    RESEND_COOLDOWN_SECONDS
+                            );
+
+            if (now.isBefore(cooldownEndsAt)) {
+
+                throw new OtpRateLimitException(
+                        "Please wait before requesting another OTP"
+                );
+            }
+        }
 
         String otp = String.format(
                 "%06d",
                 secureRandom.nextInt(1_000_000)
         );
 
-        OtpRequest otpRequest = new OtpRequest();
+        OtpRequest otpRequest
+                = new OtpRequest();
 
         otpRequest.setIdentifier(
                 normalizedIdentifier
@@ -51,32 +80,32 @@ public class OtpService {
         );
 
         otpRequest.setExpiresAt(
-                LocalDateTime.now()
-                        .plusMinutes(OTP_EXPIRY_MINUTES)
+                now.plusMinutes(
+                        OTP_EXPIRY_MINUTES
+                )
         );
 
         otpRequest.setAttempts(0);
         otpRequest.setVerified(false);
-        otpRequest.setCreatedAt(
-                LocalDateTime.now()
+        otpRequest.setCreatedAt(now);
+
+        otpRequestRepository.save(
+                otpRequest
         );
 
-        otpRequestRepository.save(otpRequest);
-
         /*
- * Development-only OTP logging.
- *
- * In production this will be replaced by a real
- * SMS/email delivery provider.
- */
-System.out.println(
-        "DEV OTP for "
+     * Development-only OTP logging.
+     *
+     * Production will use a real SMS/email provider.
+         */
+        System.out.println(
+                "DEV OTP for "
                 + normalizedIdentifier
                 + ": "
                 + otp
-);
+        );
 
-return otp;
+        return otp;
     }
 
     @Transactional
@@ -84,18 +113,18 @@ return otp;
             String identifier,
             String otp) {
 
-        String normalizedIdentifier =
-                normalizeIdentifier(identifier);
+        String normalizedIdentifier
+                = normalizeIdentifier(identifier);
 
-        OtpRequest otpRequest =
-                otpRequestRepository
+        OtpRequest otpRequest
+                = otpRequestRepository
                         .findTopByIdentifierOrderByCreatedAtDesc(
                                 normalizedIdentifier
                         )
-                        .orElseThrow(() ->
-                                new IllegalStateException(
-                                        "OTP request not found"
-                                )
+                        .orElseThrow(()
+                                -> new IllegalStateException(
+                                "OTP request not found"
+                        )
                         );
 
         if (otpRequest.isVerified()) {
@@ -147,14 +176,13 @@ return otp;
     private String normalizeIdentifier(
             String identifier) {
 
-        if (identifier == null ||
-                identifier.isBlank()) {
+        if (identifier == null
+                || identifier.isBlank()) {
 
-            throw new IllegalArgumentException(
+            throw new InvalidIdentifierException(
                     "Phone or email is required"
             );
         }
-
         return identifier
                 .trim()
                 .toLowerCase();
@@ -164,18 +192,18 @@ return otp;
 
         try {
 
-            MessageDigest digest =
-                    MessageDigest.getInstance("SHA-256");
+            MessageDigest digest
+                    = MessageDigest.getInstance("SHA-256");
 
-            byte[] hash =
-                    digest.digest(
+            byte[] hash
+                    = digest.digest(
                             otp.getBytes(
                                     StandardCharsets.UTF_8
                             )
                     );
 
-            StringBuilder result =
-                    new StringBuilder();
+            StringBuilder result
+                    = new StringBuilder();
 
             for (byte b : hash) {
 

@@ -1,50 +1,59 @@
 package vanset_backend.exception;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
 public class GlobalExceptionHandler {
+@ExceptionHandler(InvalidIdentifierException.class)
+public ResponseEntity<Map<String, String>>
+        handleInvalidIdentifier(
+                InvalidIdentifierException exception) {
 
-    @ExceptionHandler(ProductNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleProductNotFound(
-            ProductNotFoundException exception) {
+    Map<String, String> response =
+            new HashMap<>();
 
-        return exception.getMessage();
+    response.put(
+            "error",
+            "INVALID_IDENTIFIER"
+    );
+
+    response.put(
+            "message",
+            exception.getMessage()
+    );
+
+    return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(response);
+}
+    @ExceptionHandler(OtpRateLimitException.class)
+    public ResponseEntity<Map<String, String>>
+            handleOtpRateLimit(
+                    OtpRateLimitException exception) {
+
+        Map<String, String> response =
+                new HashMap<>();
+
+        response.put(
+                "error",
+                "OTP_RATE_LIMIT"
+        );
+
+        response.put(
+                "message",
+                exception.getMessage()
+        );
+
+        return ResponseEntity
+                .status(HttpStatus.TOO_MANY_REQUESTS)
+                .body(response);
     }
 
-    @ExceptionHandler(CategoryNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleCategoryNotFound(
-            CategoryNotFoundException exception) {
-
-        return exception.getMessage();
-    }
-
-    @ExceptionHandler(ProductVariantNotFoundException.class)
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleProductVariantNotFound(
-            ProductVariantNotFoundException exception) {
-
-        return exception.getMessage();
-    }
-
-    @ExceptionHandler(IllegalArgumentException.class)
-    @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public String handleIllegalArgumentException(
-            IllegalArgumentException exception) {
-
-        return exception.getMessage();
-    }
-
-    @ExceptionHandler(IllegalStateException.class)
-    @ResponseStatus(HttpStatus.CONFLICT)
-    public String handleIllegalStateException(
-            IllegalStateException exception) {
-
-        return exception.getMessage();
-    }
+    // Your existing exception handlers go below this.
 }
