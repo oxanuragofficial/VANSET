@@ -68,29 +68,63 @@ public class PaymentService {
 
         return toResponse(savedPayment);
     }
-    @Transactional(readOnly = true)
-public PaymentResponse getPaymentByOrderId(Long orderId) {
 
-    Payment payment = paymentRepository.findByOrderId(orderId)
-            .orElseThrow(() ->
-                    new IllegalStateException(
-                            "Payment not found for order: " + orderId));
+    @Transactional
+    public PaymentResponse markAdvancePaid(Long orderId) {
 
-    return toResponse(payment);
-}
-@Transactional(readOnly = true)
-public boolean isAdvancePaid(Long orderId) {
+        Payment payment = paymentRepository.findByOrderId(orderId)
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Payment not found for order: " + orderId));
 
-    Payment payment = paymentRepository.findByOrderId(orderId)
-            .orElse(null);
+        if (payment.getStatus() == PaymentStatus.ADVANCE_PAID) {
+            throw new IllegalStateException(
+                    "Advance payment is already marked as paid");
+        }
 
-    if (payment == null) {
-        return false;
+        if (payment.getStatus() == PaymentStatus.FULLY_PAID) {
+            throw new IllegalStateException(
+                    "Payment is already fully paid");
+        }
+
+        if (payment.getStatus() != PaymentStatus.PENDING) {
+            throw new IllegalStateException(
+                    "Advance payment cannot be recorded from status: "
+                            + payment.getStatus());
+        }
+
+        payment.setStatus(PaymentStatus.ADVANCE_PAID);
+        payment.setUpdatedAt(LocalDateTime.now());
+
+        Payment savedPayment = paymentRepository.save(payment);
+
+        return toResponse(savedPayment);
     }
 
-    return payment.getStatus() == PaymentStatus.ADVANCE_PAID
-            || payment.getStatus() == PaymentStatus.FULLY_PAID;
-}
+    @Transactional(readOnly = true)
+    public PaymentResponse getPaymentByOrderId(Long orderId) {
+
+        Payment payment = paymentRepository.findByOrderId(orderId)
+                .orElseThrow(() ->
+                        new IllegalStateException(
+                                "Payment not found for order: " + orderId));
+
+        return toResponse(payment);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isAdvancePaid(Long orderId) {
+
+        Payment payment = paymentRepository.findByOrderId(orderId)
+                .orElse(null);
+
+        if (payment == null) {
+            return false;
+        }
+
+        return payment.getStatus() == PaymentStatus.ADVANCE_PAID
+                || payment.getStatus() == PaymentStatus.FULLY_PAID;
+    }
 
     private PaymentResponse toResponse(Payment payment) {
 
