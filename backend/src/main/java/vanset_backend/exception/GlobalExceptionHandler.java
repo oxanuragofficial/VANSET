@@ -10,13 +10,17 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(ProductNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleProductNotFound(ProductNotFoundException exception) {
+    public String handleProductNotFound(
+            ProductNotFoundException exception) {
+
         return exception.getMessage();
     }
 
     @ExceptionHandler(CategoryNotFoundException.class)
     @ResponseStatus(HttpStatus.NOT_FOUND)
-    public String handleCategoryNotFound(CategoryNotFoundException exception) {
+    public String handleCategoryNotFound(
+            CategoryNotFoundException exception) {
+
         return exception.getMessage();
     }
 
@@ -32,6 +36,14 @@ public class GlobalExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     public String handleIllegalArgumentException(
             IllegalArgumentException exception) {
+
+        return exception.getMessage();
+    }
+
+    @ExceptionHandler(IllegalStateException.class)
+    @ResponseStatus(HttpStatus.CONFLICT)
+    public String handleIllegalStateException(
+            IllegalStateException exception) {
 
         return exception.getMessage();
     }

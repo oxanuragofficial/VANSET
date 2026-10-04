@@ -36,19 +36,22 @@ public class OrderService {
     private final UserRepository userRepository;
     private final ProductVariantRepository productVariantRepository;
     private final AddressRepository addressRepository;
+    private final PaymentService paymentService;
 
     public OrderService(
             OrderRepository orderRepository,
             OrderItemRepository orderItemRepository,
             UserRepository userRepository,
             ProductVariantRepository productVariantRepository,
-            AddressRepository addressRepository) {
+            AddressRepository addressRepository,
+            PaymentService paymentService) {
 
         this.orderRepository = orderRepository;
         this.orderItemRepository = orderItemRepository;
         this.userRepository = userRepository;
         this.productVariantRepository = productVariantRepository;
         this.addressRepository = addressRepository;
+        this.paymentService = paymentService;
     }
 
     @Transactional
@@ -164,6 +167,14 @@ public class OrderService {
                         new OrderNotFoundException(id));
 
         OrderStatus currentStatus = order.getStatus();
+
+        if (currentStatus == OrderStatus.PENDING
+                && newStatus == OrderStatus.CONFIRMED
+                && !paymentService.isAdvancePaid(id)) {
+
+            throw new IllegalStateException(
+                    "50% advance payment is required before order confirmation");
+        }
 
         if (!isValidTransition(currentStatus, newStatus)) {
             throw new IllegalArgumentException(
