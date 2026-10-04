@@ -64,13 +64,19 @@ public class OtpService {
         otpRequestRepository.save(otpRequest);
 
         /*
-         * Temporary development return.
-         *
-         * This will NOT be exposed in the production
-         * authentication API. A real SMS/email provider
-         * will deliver the OTP to the user.
-         */
-        return otp;
+ * Development-only OTP logging.
+ *
+ * In production this will be replaced by a real
+ * SMS/email delivery provider.
+ */
+System.out.println(
+        "DEV OTP for "
+                + normalizedIdentifier
+                + ": "
+                + otp
+);
+
+return otp;
     }
 
     @Transactional

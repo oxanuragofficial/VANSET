@@ -7,6 +7,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import vanset_backend.dto.AuthResponse;
+import vanset_backend.service.AuthService;
 import vanset_backend.service.OtpService;
 
 @RestController
@@ -14,27 +16,33 @@ import vanset_backend.service.OtpService;
 public class OtpController {
 
     private final OtpService otpService;
+    private final AuthService authService;
 
-    public OtpController(OtpService otpService) {
+    public OtpController(
+            OtpService otpService,
+            AuthService authService) {
+
         this.otpService = otpService;
+        this.authService = authService;
     }
 
     @PostMapping("/request")
     public Map<String, String> requestOtp(
             @RequestBody Map<String, String> request) {
 
-        String identifier = request.get("identifier");
+        String identifier =
+                request.get("identifier");
 
-        String otp = otpService.generateOtp(identifier);
+        otpService.generateOtp(identifier);
 
         return Map.of(
-                "message", "OTP generated",
-                "otp", otp
+                "message",
+                "OTP sent successfully"
         );
     }
 
     @PostMapping("/verify")
-    public Map<String, Object> verifyOtp(
+    public AuthResponse verifyOtp(
             @RequestBody Map<String, String> request) {
 
         String identifier =
@@ -43,15 +51,9 @@ public class OtpController {
         String otp =
                 request.get("otp");
 
-        boolean verified =
-                otpService.verifyOtp(
-                        identifier,
-                        otp
-                );
-
-        return Map.of(
-                "verified",
-                verified
+        return authService.verifyOtpAndLogin(
+                identifier,
+                otp
         );
     }
 }

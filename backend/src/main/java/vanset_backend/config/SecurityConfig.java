@@ -23,9 +23,12 @@ public class SecurityConfig {
         http
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers(
+                
+.requestMatchers(
         "/api/health",
         "/api/test",
+        "/api/auth/otp/request",
+        "/api/auth/otp/verify",
         "/api/products",
         "/api/products/**",
         "/api/categories",
@@ -40,7 +43,8 @@ public class SecurityConfig {
         "/api/addresses/**",
         "/api/users/*/addresses",
         "/error"
-).permitAll()
+)
+.permitAll()
                 .anyRequest().authenticated()
                 )
                 .oauth2ResourceServer(oauth2
