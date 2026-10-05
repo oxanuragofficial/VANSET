@@ -32,6 +32,72 @@ public ResponseEntity<Map<String, String>>
             .status(HttpStatus.BAD_REQUEST)
             .body(response);
 }
+@ExceptionHandler(InvalidOtpException.class)
+public ResponseEntity<Map<String, String>>
+        handleInvalidOtp(
+                InvalidOtpException exception) {
+
+    Map<String, String> response =
+            new HashMap<>();
+
+    response.put(
+            "error",
+            "INVALID_OTP"
+    );
+
+    response.put(
+            "message",
+            exception.getMessage()
+    );
+
+    return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(response);
+}
+@ExceptionHandler(OtpAttemptsExceededException.class)
+public ResponseEntity<Map<String, String>>
+        handleOtpAttemptsExceeded(
+                OtpAttemptsExceededException exception) {
+
+    Map<String, String> response =
+            new HashMap<>();
+
+    response.put(
+            "error",
+            "OTP_ATTEMPTS_EXCEEDED"
+    );
+
+    response.put(
+            "message",
+            exception.getMessage()
+    );
+
+    return ResponseEntity
+            .status(HttpStatus.TOO_MANY_REQUESTS)
+            .body(response);
+}
+@ExceptionHandler(OtpExpiredException.class)
+public ResponseEntity<Map<String, String>>
+        handleOtpExpired(
+                OtpExpiredException exception) {
+
+    Map<String, String> response =
+            new HashMap<>();
+
+    response.put(
+            "error",
+            "OTP_EXPIRED"
+    );
+
+    response.put(
+            "message",
+            exception.getMessage()
+    );
+
+    return ResponseEntity
+            .status(HttpStatus.BAD_REQUEST)
+            .body(response);
+}
     @ExceptionHandler(OtpRateLimitException.class)
     public ResponseEntity<Map<String, String>>
             handleOtpRateLimit(

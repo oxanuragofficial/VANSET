@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import vanset_backend.dto.AuthResponse;
 import vanset_backend.entity.User;
 import vanset_backend.entity.UserRole;
+import vanset_backend.exception.InvalidOtpException;
 import vanset_backend.repository.UserRepository;
 
 @Service
@@ -37,10 +38,10 @@ public class AuthService {
                 );
 
         if (!verified) {
-            throw new IllegalArgumentException(
-                    "Invalid OTP"
-            );
-        }
+    throw new InvalidOtpException(
+            "Invalid OTP"
+    );
+}
 
         String normalizedIdentifier =
                 identifier.trim().toLowerCase();

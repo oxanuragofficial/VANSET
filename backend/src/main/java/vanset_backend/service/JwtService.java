@@ -23,32 +23,47 @@ public class JwtService {
 
         Instant now = Instant.now();
 
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer("vanset")
-                .issuedAt(now)
-                .expiresAt(
-                        now.plus(24, ChronoUnit.HOURS)
-                )
-                .subject(
-                        user.getId().toString()
-                )
-                .claim(
-                        "role",
-                        user.getRole().name()
-                )
-                .claim(
-                        "email",
-                        user.getEmail()
-                )
-                .claim(
-                        "phone",
-                        user.getPhone()
-                )
-                .build();
+        JwtClaimsSet.Builder claimsBuilder =
+                JwtClaimsSet.builder()
+                        .issuer("vanset")
+                        .issuedAt(now)
+                        .expiresAt(
+                                now.plus(
+                                        24,
+                                        ChronoUnit.HOURS
+                                )
+                        )
+                        .subject(
+                                user.getId().toString()
+                        )
+                        .claim(
+                                "role",
+                                user.getRole().name()
+                        );
+
+        if (user.getEmail() != null &&
+                !user.getEmail().isBlank()) {
+
+            claimsBuilder.claim(
+                    "email",
+                    user.getEmail()
+            );
+        }
+
+        if (user.getPhone() != null &&
+                !user.getPhone().isBlank()) {
+
+            claimsBuilder.claim(
+                    "phone",
+                    user.getPhone()
+            );
+        }
 
         return jwtEncoder
                 .encode(
-                        JwtEncoderParameters.from(claims)
+                        JwtEncoderParameters.from(
+                                claimsBuilder.build()
+                        )
                 )
                 .getTokenValue();
     }

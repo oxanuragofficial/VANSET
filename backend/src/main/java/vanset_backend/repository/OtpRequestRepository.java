@@ -1,5 +1,6 @@
 package vanset_backend.repository;
 
+import java.time.LocalDateTime;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,5 +11,11 @@ public interface OtpRequestRepository
         extends JpaRepository<OtpRequest, Long> {
 
     Optional<OtpRequest> findTopByIdentifierOrderByCreatedAtDesc(
-            String identifier);
+            String identifier
+    );
+
+    long countByIdentifierAndCreatedAtAfter(
+            String identifier,
+            LocalDateTime createdAt
+    );
 }
