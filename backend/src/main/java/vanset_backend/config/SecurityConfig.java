@@ -13,8 +13,8 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(
             HttpSecurity http) throws Exception {
 
-        JwtAuthenticationConverter jwtAuthenticationConverter
-                = new JwtAuthenticationConverter();
+        JwtAuthenticationConverter jwtAuthenticationConverter =
+                new JwtAuthenticationConverter();
 
         jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(
                 new vanset_backend.config.JwtAuthenticationConverter()
@@ -22,37 +22,54 @@ public class SecurityConfig {
 
         http
                 .csrf(csrf -> csrf.disable())
+
                 .authorizeHttpRequests(auth -> auth
-                
-.requestMatchers(
-        "/api/health",
-        "/api/test",
-        "/api/auth/otp/request",
-        "/api/auth/otp/verify",
-        "/api/products",
-        "/api/products/**",
-        "/api/categories",
-        "/api/categories/**",
-        "/api/product-variants",
-        "/api/product-variants/**",
-        "/api/collections",
-        "/api/collections/**",
-        "/api/orders",
-        "/api/orders/**",
-        "/api/addresses",
-        "/api/addresses/**",
-        "/api/users/*/addresses",
-        "/error"
-)
-.permitAll()
-                .anyRequest().authenticated()
+
+                        /*
+                         * CUSTOMER-only address endpoints.
+                         *
+                         * These rules MUST appear before
+                         * any broad permitAll address rules.
+                         */
+                        .requestMatchers(
+                                "/api/addresses",
+                                "/api/addresses/**",
+                                "/api/users/*/addresses"
+                        ).hasRole("CUSTOMER")
+
+                        /*
+                         * Public endpoints.
+                         */
+                        .requestMatchers(
+                                "/api/health",
+                                "/api/test",
+                                "/api/auth/otp/request",
+                                "/api/auth/otp/verify",
+                                "/api/products",
+                                "/api/products/**",
+                                "/api/categories",
+                                "/api/categories/**",
+                                "/api/product-variants",
+                                "/api/product-variants/**",
+                                "/api/collections",
+                                "/api/collections/**",
+                                "/api/orders",
+                                "/api/orders/**",
+                                "/error"
+                        ).permitAll()
+
+                        /*
+                         * Everything else requires authentication.
+                         */
+                        .anyRequest().authenticated()
                 )
-                .oauth2ResourceServer(oauth2
-                        -> oauth2.jwt(jwt
-                        -> jwt.jwtAuthenticationConverter(
-                        jwtAuthenticationConverter
-                )
-                )
+
+                .oauth2ResourceServer(oauth2 ->
+                        oauth2.jwt(jwt ->
+                                jwt.jwtAuthenticationConverter(
+                                        jwtAuthenticationConverter
+                                )
+                        )
                 );
 
         return http.build();

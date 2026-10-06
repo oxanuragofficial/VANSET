@@ -2,6 +2,8 @@ package vanset_backend.service;
 
 import java.util.List;
 
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import vanset_backend.dto.AddressRequest;
@@ -27,45 +29,88 @@ public class AddressService {
         this.userRepository = userRepository;
     }
 
-    public AddressResponse createAddress(AddressRequest request) {
+    public AddressResponse createAddress(
+            AddressRequest request) {
 
-        User user = userRepository.findById(request.getUserId())
-                .orElseThrow(() ->
-                        new UserNotFoundException(request.getUserId()));
+        Long authenticatedUserId =
+                getAuthenticatedUserId();
+
+        User user =
+                userRepository.findById(
+                        authenticatedUserId
+                ).orElseThrow(() ->
+                        new UserNotFoundException(
+                                authenticatedUserId
+                        ));
 
         Address address = new Address();
 
         address.setLabel(request.getLabel());
-        address.setRecipientName(request.getRecipientName());
-        address.setPhone(request.getPhone());
-        address.setAddressLine(request.getAddressLine());
-        address.setCity(request.getCity());
-        address.setState(request.getState());
-        address.setPincode(request.getPincode());
+        address.setRecipientName(
+                request.getRecipientName()
+        );
+        address.setPhone(
+                request.getPhone()
+        );
+        address.setAddressLine(
+                request.getAddressLine()
+        );
+        address.setCity(
+                request.getCity()
+        );
+        address.setState(
+                request.getState()
+        );
+        address.setPincode(
+                request.getPincode()
+        );
+
         address.setUser(user);
 
-        Address savedAddress = addressRepository.save(address);
+        Address savedAddress =
+                addressRepository.save(address);
 
         return toResponse(savedAddress);
     }
 
-    public List<AddressResponse> getAddressesByUserId(Long userId) {
+    public List<AddressResponse> getAddressesByUserId(
+            Long userId) {
+
+        Long authenticatedUserId =
+                getAuthenticatedUserId();
+
+        ensureSameUser(
+                userId,
+                authenticatedUserId
+        );
 
         if (!userRepository.existsById(userId)) {
             throw new UserNotFoundException(userId);
         }
 
-        return addressRepository.findByUserId(userId)
+        return addressRepository
+                .findByUserId(userId)
                 .stream()
                 .map(this::toResponse)
                 .toList();
     }
 
-    public AddressResponse getAddressById(Long id) {
+    public AddressResponse getAddressById(
+            Long id) {
 
-        Address address = addressRepository.findById(id)
-                .orElseThrow(() ->
-                        new AddressNotFoundException(id));
+        Long authenticatedUserId =
+                getAuthenticatedUserId();
+
+        Address address =
+                addressRepository
+                        .findByIdAndUserId(
+                                id,
+                                authenticatedUserId
+                        )
+                        .orElseThrow(() ->
+                                new AddressNotFoundException(
+                                        id
+                                ));
 
         return toResponse(address);
     }
@@ -74,33 +119,115 @@ public class AddressService {
             Long id,
             AddressRequest request) {
 
-        Address existingAddress = addressRepository.findById(id)
-                .orElseThrow(() ->
-                        new AddressNotFoundException(id));
+        Long authenticatedUserId =
+                getAuthenticatedUserId();
 
-        existingAddress.setLabel(request.getLabel());
-        existingAddress.setRecipientName(request.getRecipientName());
-        existingAddress.setPhone(request.getPhone());
-        existingAddress.setAddressLine(request.getAddressLine());
-        existingAddress.setCity(request.getCity());
-        existingAddress.setState(request.getState());
-        existingAddress.setPincode(request.getPincode());
+        Address existingAddress =
+                addressRepository
+                        .findByIdAndUserId(
+                                id,
+                                authenticatedUserId
+                        )
+                        .orElseThrow(() ->
+                                new AddressNotFoundException(
+                                        id
+                                ));
 
-        Address savedAddress = addressRepository.save(existingAddress);
+        existingAddress.setLabel(
+                request.getLabel()
+        );
+        existingAddress.setRecipientName(
+                request.getRecipientName()
+        );
+        existingAddress.setPhone(
+                request.getPhone()
+        );
+        existingAddress.setAddressLine(
+                request.getAddressLine()
+        );
+        existingAddress.setCity(
+                request.getCity()
+        );
+        existingAddress.setState(
+                request.getState()
+        );
+        existingAddress.setPincode(
+                request.getPincode()
+        );
+
+        Address savedAddress =
+                addressRepository.save(
+                        existingAddress
+                );
 
         return toResponse(savedAddress);
     }
 
     public void deleteAddress(Long id) {
 
-        if (!addressRepository.existsById(id)) {
-            throw new AddressNotFoundException(id);
-        }
+        Long authenticatedUserId =
+                getAuthenticatedUserId();
 
-        addressRepository.deleteById(id);
+        Address address =
+                addressRepository
+                        .findByIdAndUserId(
+                                id,
+                                authenticatedUserId
+                        )
+                        .orElseThrow(() ->
+                                new AddressNotFoundException(
+                                        id
+                                ));
+
+        addressRepository.delete(address);
     }
 
-    private AddressResponse toResponse(Address address) {
+    private Long getAuthenticatedUserId() {
+
+        Authentication authentication =
+                SecurityContextHolder
+                        .getContext()
+                        .getAuthentication();
+
+        if (authentication == null ||
+                !authentication.isAuthenticated()) {
+
+            throw new IllegalStateException(
+                    "User is not authenticated"
+            );
+        }
+
+        try {
+
+            return Long.parseLong(
+                    authentication.getName()
+            );
+
+        } catch (NumberFormatException exception) {
+
+            throw new IllegalStateException(
+                    "Invalid authenticated user ID",
+                    exception
+            );
+        }
+    }
+
+    private void ensureSameUser(
+            Long requestedUserId,
+            Long authenticatedUserId) {
+
+        if (!requestedUserId.equals(
+                authenticatedUserId
+        )) {
+
+            throw new IllegalStateException(
+                    "You can only access your own addresses"
+            );
+        }
+    }
+
+    private AddressResponse toResponse(
+            Address address) {
 
         return new AddressResponse(
                 address.getId(),

@@ -20,7 +20,9 @@ public class AddressController {
 
     private final AddressService addressService;
 
-    public AddressController(AddressService addressService) {
+    public AddressController(
+            AddressService addressService) {
+
         this.addressService = addressService;
     }
 
@@ -35,7 +37,9 @@ public class AddressController {
     public List<AddressResponse> getAddressesByUserId(
             @PathVariable Long userId) {
 
-        return addressService.getAddressesByUserId(userId);
+        return addressService.getAddressesByUserId(
+                userId
+        );
     }
 
     @GetMapping("/api/addresses/{id}")
@@ -50,7 +54,10 @@ public class AddressController {
             @PathVariable Long id,
             @Valid @RequestBody AddressRequest request) {
 
-        return addressService.updateAddress(id, request);
+        return addressService.updateAddress(
+                id,
+                request
+        );
     }
 
     @DeleteMapping("/api/addresses/{id}")

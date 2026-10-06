@@ -1,13 +1,9 @@
 package vanset_backend.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 public class AddressRequest {
-
-    @NotNull(message = "User ID is required")
-    private Long userId;
 
     private String label;
 
@@ -36,14 +32,6 @@ public class AddressRequest {
             message = "Pincode must be a valid 6-digit Indian pincode"
     )
     private String pincode;
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 
     public String getLabel() {
         return label;
