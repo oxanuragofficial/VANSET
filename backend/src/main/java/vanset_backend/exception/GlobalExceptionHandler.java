@@ -120,6 +120,28 @@ public ResponseEntity<Map<String, String>>
                 .status(HttpStatus.TOO_MANY_REQUESTS)
                 .body(response);
     }
+    @ExceptionHandler(UnauthorizedResourceAccessException.class)
+public ResponseEntity<Map<String, String>>
+        handleUnauthorizedResourceAccess(
+                UnauthorizedResourceAccessException exception) {
+
+    Map<String, String> response =
+            new HashMap<>();
+
+    response.put(
+            "error",
+            "FORBIDDEN"
+    );
+
+    response.put(
+            "message",
+            exception.getMessage()
+    );
+
+    return ResponseEntity
+            .status(HttpStatus.FORBIDDEN)
+            .body(response);
+}
 
     // Your existing exception handlers go below this.
 }

@@ -11,6 +11,7 @@ import vanset_backend.dto.AddressResponse;
 import vanset_backend.entity.Address;
 import vanset_backend.entity.User;
 import vanset_backend.exception.AddressNotFoundException;
+import vanset_backend.exception.UnauthorizedResourceAccessException;
 import vanset_backend.exception.UserNotFoundException;
 import vanset_backend.repository.AddressRepository;
 import vanset_backend.repository.UserRepository;
@@ -212,19 +213,19 @@ public class AddressService {
         }
     }
 
-    private void ensureSameUser(
-            Long requestedUserId,
-            Long authenticatedUserId) {
+private void ensureSameUser(
+        Long requestedUserId,
+        Long authenticatedUserId) {
 
-        if (!requestedUserId.equals(
-                authenticatedUserId
-        )) {
+    if (!requestedUserId.equals(
+            authenticatedUserId
+    )) {
 
-            throw new IllegalStateException(
-                    "You can only access your own addresses"
-            );
-        }
+        throw new UnauthorizedResourceAccessException(
+                "You can only access your own addresses"
+        );
     }
+}
 
     private AddressResponse toResponse(
             Address address) {
